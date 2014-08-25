@@ -182,7 +182,11 @@ void RR10::update()
      
      if( cmdUpdate() )//when reading is finished
      {
-       if(rfidp[3] > 0 && rfidp[3] < 8)//tag found
+       // Had some weird readings, so be paranoid here. Explanation:
+       // rfidp[0] is the length, 0x0E if no tags found
+       // rfidp[3] is the number of tags found, maximum of 8
+       // rfidp[4] is the length of the first UID, which can be 3, 7, or 10.
+       if(rfidp[0] > 0x0E && rfidp[3] > 0 && rfidp[3] < 8 && rfidp[4] > 2 && rfidp[4] < 11)//tag found
         {
           int uidlen = rfidp[4];
           byte realuid[uidlen];
