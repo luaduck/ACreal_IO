@@ -1,3 +1,5 @@
+#include <HexConversionUtils.h>
+
 #include "Node.h"
 #include "Reader.h"
 #include "LedBoard.h"
@@ -6,8 +8,7 @@
 #include "RR10.h"
 #include "SL015M.h"
 #include "Ddr.h"
-
-
+#include <LiquidCrystal.h>
 
 #define MINTIME 14                // Min time between 2 sent packet(Min is 14ms, Max is around 50ms) some games require this
 #define MAX_NODES 3
@@ -24,6 +25,20 @@ boolean initDone = false;         // indicate whether init has been done
 //timestamps
 unsigned long lastSent;   
 unsigned long lastRecv;  
+
+byte eyeeye[8] = {
+    B11111,
+    B01010,
+    B01010,
+    B01010,
+    B01010,
+    B01010,
+    B11111
+};
+
+#if USE_LCD==1
+    LiquidCrystal lcd(LCD_RS,LCD_EN,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
+#endif
 
 /////////////////////////
 // Nodes properties
@@ -100,6 +115,22 @@ RR10 mod2;
 //
 void setup()
 {
+  if (USE_LCD) {
+    // Set up the LCD.
+    lcd.begin(16,LCD_ROWS);
+    lcd.createChar(0,eyeeye);
+    lcd.noAutoscroll();
+    if (LCD_STATUSLINE > 1) {
+      lcd.setCursor(-4,LCD_STATUSLINE);
+    } else {
+      lcd.setCursor(0,LCD_STATUSLINE);
+    }
+    lcd.print("Have an enjoying");
+    lcd.setCursor(0,0);
+    mod1.setLcd(&lcd,LCD_ROWS,LCD_STATUSLINE);
+    mod1.setReaderNumber(1);
+  }
+
   // set nodes configuration
   
   //set first rfid module
@@ -115,6 +146,10 @@ void setup()
    
    nbnodes = 2;
 
+   if (USE_LCD) {
+     lcd.print("Pop'n + CardDisp");
+   }
+
 #elif GAMETYPE == 1 //1 reader
 
    nod1.setrCode("ICCA",0);
@@ -123,6 +158,10 @@ void setup()
    
    nbnodes = 1;
 
+   if (USE_LCD) {
+     lcd.print("Pop'n/DrumMania");
+   }
+
 #elif GAMETYPE == 2 //2 readers
    //1p reader
    nod1.setrCode("ICCA",1);
@@ -130,6 +169,11 @@ void setup()
    nodes[0] = &nod1;
    
    //set rfid module 2
+   mod2.setReaderNumber(2);
+   if (USE_LCD) {
+     mod2.setLcd(&lcd,LCD_ROWS,LCD_STATUSLINE);
+   }
+
    mod2.setPins(R2_DET,&R2_SER);
    nod2.setRfidModule(&mod2);
    
@@ -140,6 +184,11 @@ void setup()
    
    nbnodes = 2;
 
+   if (USE_LCD) {
+     lcd.write(byte(0));
+     lcd.print("DX / DDRSD / GF");
+   }
+
 #elif GAMETYPE == 3 // reader + leboard
 
    nod1.setrCode("ICCB",2);
@@ -147,7 +196,11 @@ void setup()
    nodes[1] = &nod2;
    
    nbnodes = 2;
-   
+
+   if (USE_LCD) {
+     lcd.print("Jubeat");
+   }
+
 
 #elif GAMETYPE == 4 // reader + ioboard
 
@@ -158,6 +211,10 @@ void setup()
    nodes[1] = &nod2;
    
    nbnodes = 2;
+
+   if (USE_LCD) {
+     lcd.print("SDVX (Whoosh!)");
+   }
    
 #else // 2readers + DDR ??? board
 
@@ -167,6 +224,11 @@ void setup()
    nodes[0] = &nod1;
    
    //set rfid module 2
+   mod2.setReaderNumber(2);
+   if (USE_LCD) {
+     mod2.setLcd(&lcd,LCD_ROWS,LCD_STATUSLINE);
+   }
+
    mod2.setPins(R2_DET,&R2_SER);
    nod2.setRfidModule(&mod2);
    
@@ -179,6 +241,9 @@ void setup()
    
    nbnodes = 3;
 
+   if (USE_LCD) {
+     lcd.print("DanceDanceRev HD");
+   }
 
 #endif
 

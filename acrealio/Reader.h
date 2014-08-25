@@ -44,7 +44,6 @@ private:
     Cipher crypt; 
     
     RfidModule* rfmodule;
-    
 };
 
 #endif
