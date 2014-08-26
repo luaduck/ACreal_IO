@@ -40,7 +40,7 @@ private:
     LiquidCrystal *lcd;
     int lcd_rows;
     int lcd_statusline;
-    boolean lcd_enabled = false;
+    boolean lcd_enabled;
 
 };
 

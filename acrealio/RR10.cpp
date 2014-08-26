@@ -11,6 +11,7 @@ RR10::RR10()
   pinset = false;
   incmd = false;
   readstatus = 0;
+  lcd_enabled = false;
 }
 
 void RR10::setPins(int sensor, HardwareSerial* serialid)

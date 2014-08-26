@@ -8,6 +8,7 @@ SL015M::SL015M()
   rf_i = 0;
   pinset = false;
   readcmd = false;
+  lcd_enabled = false;
 }
 
 void SL015M::setPins(int sensor, HardwareSerial* serialid)
