@@ -40,6 +40,9 @@ void RR10::update()
      case 0:
      {
      //let's read ISO15693 first
+     while (cmdUpdate()) {
+       delay(50);
+     }
      
      byte cmd[7] = {0x07,0x06,0x00,0x00,0x00}; //command 0x06 : ISO15693 Tag Inventory (params : normal mode, no AFI)
      sendCmd(cmd);
@@ -108,6 +111,9 @@ void RR10::update()
      case 1:
      {
      //no ISO15696 found, let's try to find some FeliCa instead
+     while (cmdUpdate()) {
+       delay(50);
+     }
 
      byte cmd[4] = {0x04,0x0E,0x00,0x0A}; //command 0x0E : FeliCa Tag Inventory
      sendCmd(cmd);
