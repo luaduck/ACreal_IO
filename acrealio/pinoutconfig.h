@@ -69,13 +69,17 @@
 COL C  COL B  COL A
 
 */
-#define K1_A 27
-#define K1_B 25
-#define K1_C 23
-#define K1_1 29
-#define K1_2 31
-#define K1_3 33
-#define K1_4 35
+#define K1_A 40
+#define K1_B 38
+#define K1_C 36
+#define K1_D 30
+#define K1_E 34
+
+#define K1_1 32
+#define K1_2 42
+#define K1_3 46
+#define K1_4 48
+#define K1_5 44
 
 
 //pins for card reader 1 RFID Module

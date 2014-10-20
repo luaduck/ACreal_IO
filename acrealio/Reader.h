@@ -14,7 +14,7 @@ public:
     void init();
     void update(); //update things like keypadstate and rfid 
 	
-    void setkeypadpins(int col1, int col2, int col3, int row1, int row2, int row3, int row4);
+    void setkeypadpins(int col1, int col2, int col3, int col4, int col5, int row1, int row2, int row3, int row4, int row5);
     void readKeypad();
 
     void setRfidModule(RfidModule* mod);
@@ -36,8 +36,8 @@ private:
     word keypad_old;            // keys pressed before last read
     byte keydown;               // used to indicated rising edge on keys
     byte keycpt;                // this cpt is incremented each time a key is pressed
-    short colPins[3];           // matrix has 3 cols...
-    short rowPins[4];           // ...and 4 rows
+    short colPins[5];           // matrix has 3 cols...
+    short rowPins[5];           // ...and 4 rows
     
     byte cmd61; //used to specify behaviour on command 0x61
     boolean new_reader; //set to true in case new wave pass card reader behaviour is requested from game

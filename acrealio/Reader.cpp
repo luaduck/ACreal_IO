@@ -32,32 +32,30 @@ void Reader::init()
 //keypad pinout setting
 /////////////////////
 
-void Reader::setkeypadpins(int col1, int col2, int col3, int row1, int row2, int row3, int row4)
+void Reader::setkeypadpins(int col1, int col2, int col3, int col4, int col5, int row1, int row2, int row3, int row4, int row5)
 {
     colPins[0] = col1; // COL 1 brown wire
     colPins[1] = col2; // COL 2 black wire
     colPins[2] = col3; // COL 3 blue wire
+    colPins[3] = col4;
+    colPins[4] = col5;
 
     rowPins[0] = row1; // ROW 4 purple wire
     rowPins[1] = row2; // ROW 3 yellow wire
     rowPins[2] = row3; // ROW 2 red wire
     rowPins[3] = row4; // ROW 1 grey wire
+    rowPins[4] = row5;
 	
 	
     // init Keypad pins
-    for(int i=0;i<3;i++)
+    for(int i = 0; i < 5; ++i)
     {
         pinMode(colPins[i], INPUT); // High impedance
-    }
-
-    for(int i=0;i<4;i++)
-    {
-        // set to input with pullup
         pinMode(rowPins[i], INPUT);
         digitalWrite(rowPins[i], HIGH);
     }
-	
-	keypadInitDone = true;
+    
+    keypadInitDone = true;
 }
 
 
@@ -86,15 +84,31 @@ void Reader::readKeypad()
 		
 		
     keypad = 0x00;
-    for(int i=0;i<3;i++)//for each collumn
+    for(int i=0;i<5;i++)//for each collumn
     {
         //set the collumn we're going to read low
         pinMode(colPins[i], OUTPUT);
         digitalWrite(colPins[i], LOW);
-        for(int j=0;j<4;j++)//for each row
+        for(int j=0;j<5;j++)//for each row
         {
-            if(! digitalRead(rowPins[j]))  //if key is down
-                keypad |= ( 0x0001 << (j + i*4) );
+            if(! digitalRead(rowPins[j])) {
+              int newi;
+              int newj;
+              
+              if (i == 2 && j == 1) {
+                newi = 1;
+                newj = 0;
+              } else {
+                if (i == 3) newi = 2;
+                else if (i == 4) newi = 0;
+                else newi = i;
+                
+                if (j == 4) newj = 1;
+                else newj = j;                
+              }
+              
+              keypad |= ( 0x0001 << (newj + newi*4) );
+            }
         }
         pinMode(colPins[i], INPUT); // after reading collumn put it back to high impedance
     }

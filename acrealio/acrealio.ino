@@ -118,7 +118,7 @@ void setup()
 #elif GAMETYPE == 1 //1 reader
 
    nod1.setrCode("ICCA",0);
-   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_1,K1_2,K1_3,K1_4);//3cols,4rows
+   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[0] = &nod1;
    
    nbnodes = 1;
