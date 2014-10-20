@@ -9,7 +9,9 @@ Fork notes
 -------------
 **This fork is currently only compatible with 5x5 matriced keypads (those with 10 pins).** Support will be added for switching between 5x5 and 3x4 at a later point, or feel free to fork this yourself and add it to be merged back in.
 
-To facilitate this, the default pinouts are changed from 27-35 to **30-48**. See pinoutconfig.h for more information.
+To facilitate this, the default pinouts are changed from 27-35 to **30-48 even**. See pinoutconfig.h for more information.
+
+We also have [bemanidave's LCD support](https://github.com/bemanidave/ACreal_IO) merged in, with the same pins (53-43 odd). If you want to use these pins for something else, change them to other values in pinoutconfig.h (disabling use_lcd breaks compilation for some reason).
 
 Games support
 -------------
