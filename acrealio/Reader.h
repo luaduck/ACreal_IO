@@ -36,8 +36,8 @@ private:
     word keypad_old;            // keys pressed before last read
     byte keydown;               // used to indicated rising edge on keys
     byte keycpt;                // this cpt is incremented each time a key is pressed
-    short colPins[5];           // matrix has 3 cols...
-    short rowPins[5];           // ...and 4 rows
+    short colPins[5];           // matrix has 5 columns...
+    short rowPins[5];           // ...and 5 rows
     
     byte cmd61; //used to specify behaviour on command 0x61
     boolean new_reader; //set to true in case new wave pass card reader behaviour is requested from game

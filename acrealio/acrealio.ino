@@ -109,7 +109,7 @@ void setup()
 #if GAMETYPE == 0  //pop'n music with card dispenser
 
    nod1.setrCode("ICCA",0);
-   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_1,K1_2,K1_3,K1_4);//3cols,4rows
+   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[0] = &nod1;
    nodes[1] = &nod2;
    
@@ -126,7 +126,7 @@ void setup()
 #elif GAMETYPE == 2 //2 readers
    //1p reader
    nod1.setrCode("ICCA",1);
-   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_1,K1_2,K1_3,K1_4);//3cols,4rows
+   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[0] = &nod1;
    
    //set rfid module 2
@@ -135,7 +135,7 @@ void setup()
    
    //2p reader
    nod2.setrCode("ICCA",1);
-   nod2.setkeypadpins(K2_A,K2_B,K2_C,K2_1,K2_2,K2_3,K2_4);//3cols,4rows
+   nod2.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[1] = &nod2;
    
    nbnodes = 2;
@@ -153,7 +153,7 @@ void setup()
 
    //1p reader
    nod1.setrCode("ICCA",1);
-   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_1,K1_2,K1_3,K1_4);//3cols,4rows
+   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[0] = &nod1;
    nodes[1] = &nod2;
    
@@ -163,7 +163,7 @@ void setup()
 
    //1p reader
    nod1.setrCode("ICCB",0);
-   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_1,K1_2,K1_3,K1_4);//3cols,4rows
+   nod1.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[0] = &nod1;
    
    //set rfid module 2
@@ -172,7 +172,7 @@ void setup()
    
    //2p reader
    nod2.setrCode("ICCB",0);
-   nod2.setkeypadpins(K2_A,K2_B,K2_C,K2_1,K2_2,K2_3,K2_4);//3cols,4rows
+   nod2.setkeypadpins(K1_A,K1_B,K1_C,K1_D,K1_E,K1_1,K1_2,K1_3,K1_4,K1_5);//5cols,5rows
    nodes[1] = &nod2;
    
    nodes[2] = &nod3;
