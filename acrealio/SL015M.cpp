@@ -8,6 +8,7 @@ SL015M::SL015M()
   rf_i = 0;
   pinset = false;
   readcmd = false;
+  lcd_enabled = false;
 }
 
 void SL015M::setPins(int sensor, HardwareSerial* serialid)
@@ -129,3 +130,17 @@ void SL015M::getUID(byte* uida)
 {
 	memcpy(uida,uid,8);
 }
+
+void SL015M::setReaderNumber(int reader)
+{
+    readerNumber = reader;
+}
+
+void SL015M::setLcd(LiquidCrystal *passed_lcd, int passed_lcd_rows, int passed_lcd_statusline)
+{
+    lcd = passed_lcd;
+    lcd_rows = passed_lcd_rows;
+    lcd_statusline = passed_lcd_statusline;
+    lcd_enabled = true;
+}
+

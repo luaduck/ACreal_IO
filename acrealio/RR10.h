@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "RfidModule.h"
+#include <LiquidCrystal.h>
 
 class RR10 : public RfidModule
 {
@@ -13,6 +14,8 @@ public:
     void update();	
     byte isCardPresent();
     void getUID(byte* uid);	
+    void setReaderNumber(int reader);
+    void setLcd(LiquidCrystal *passed_lcd, int lcd_rows, int lcd_statusline);
 private:
     void sendCmd(byte* cmd);
     boolean cmdUpdate();
@@ -31,6 +34,13 @@ private:
     unsigned long timesent;
     byte rfidp[256];            // rfid response buffer
     byte rf_i;         //response buffer size
+
+    int readerNumber;           // P1 or P2?
+
+    LiquidCrystal *lcd;
+    int lcd_rows;
+    int lcd_statusline;
+    boolean lcd_enabled;
 
 };
 

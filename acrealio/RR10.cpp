@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "RR10.h"
+#include <SipHash_2_4.h>
 
 RR10::RR10()
 {
@@ -10,6 +11,7 @@ RR10::RR10()
   pinset = false;
   incmd = false;
   readstatus = 0;
+  lcd_enabled = false;
 }
 
 void RR10::setPins(int sensor, HardwareSerial* serialid)
@@ -27,6 +29,10 @@ void RR10::update()
 	return;
   if(!readcmd)
       return;
+
+  // 16 chars + null
+  char lcdline[17];
+  char hex[2];
       
       
    switch(readstatus)
@@ -40,22 +46,45 @@ void RR10::update()
      
      if( cmdUpdate() )//when reading is finished
      {
-       
        if(rfidp[2] != 0)//tag found
         {
-          
 	  //at least one tag is found, let's read the uid of the first tag (extra tags are ignored)
           for(int i=0;i<8;i++)
           {
              uid[i] = rfidp[11-i];
+             if (i == 0) {
+                sprintf(lcdline,"%02X",uid[i]);
+             } else {
+                sprintf(hex,"%02X",uid[i]);
+                strcat(lcdline,hex);
+             }
           }			
-		
+
 		
           if(uid[0] == 0xE0 && uid[1] == 0x04)  // if correct konami card, reading is done, don't every bother to check for Felica
           {
             card = 1;
             readcmd = false;
             readstatus = 0;
+
+            if (lcd_enabled) {
+               if (lcd_rows == 4) {
+                 lcd->setCursor(0,1);
+                 char line2[17];
+                 sprintf(line2,"P%d ISO15693     ",readerNumber);
+                 lcd->print(line2);
+     
+                 lcd->setCursor(-4,2);
+                 lcd->print("e-AMUSEMENT PASS");
+               }
+
+             if (LCD_STATUSLINE > 1) {
+               lcd->setCursor(-4,LCD_STATUSLINE);
+             } else {
+               lcd->setCursor(0,LCD_STATUSLINE);
+             }
+             lcd->print(lcdline);
+            }
           }
           else
           {
@@ -79,7 +108,7 @@ void RR10::update()
      case 1:
      {
      //no ISO15696 found, let's try to find some FeliCa instead
-     
+
      byte cmd[4] = {0x04,0x0E,0x00,0x0A}; //command 0x0E : FeliCa Tag Inventory
      sendCmd(cmd);
      
@@ -93,8 +122,34 @@ void RR10::update()
           for(int i=0;i<8;i++)
           {
              uid[i] = rfidp[3+i];
+             if (i == 0) {
+                sprintf(lcdline,"%02X",uid[i]);
+             } else {
+                sprintf(hex,"%02X",uid[i]);
+                strcat(lcdline,hex);
+             }
           }			
-	
+
+          if (lcd_enabled) {
+             if (lcd_rows == 4) {
+               lcd->setCursor(-4,1);
+               char line2[17];
+               sprintf(line2,"P%d FeliCa       ",readerNumber);
+               lcd->print(line2);
+   
+               lcd->setCursor(-4,2);
+               lcd->print("e-AMUSEMENT PASS");
+             }
+
+             if (LCD_STATUSLINE > 1) {
+               lcd->setCursor(-4,LCD_STATUSLINE);
+             } else {
+               lcd->setCursor(0,LCD_STATUSLINE);
+             }
+
+             lcd->print(lcdline);
+          }
+
           card = 2;
           readcmd = false;
           readstatus = 0;
@@ -103,28 +158,116 @@ void RR10::update()
         }
         else
         {
+          readstatus = 2;
+        }
+            
+     } else {
+        readstatus = 2;
+     }
+     
+     break;
+     
+     }      
+
+     case 2:
+     {
+     // Give ISO14443-A a go, e.g. mifare classic.
+     // Hashes the ID it gets back
+
+     while (cmdUpdate()) {
+       delay(50);
+     }
+
+     byte cmd[5] = {0x05,0x09,0x00,0x00,0x00}; //command 0x09 : ISO14443 Tag Inventory 
+     sendCmd(cmd);
+     
+     if( cmdUpdate() )//when reading is finished
+     {
+       // Had some weird readings, so be paranoid here. Explanation:
+       // rfidp[0] is the length, 0x0E if no tags found
+       // rfidp[3] is the number of tags found, maximum of 8
+       // rfidp[4] is the length of the first UID, which can be 3, 7, or 10.
+       if(rfidp[0] > 0x0E && rfidp[3] > 0 && rfidp[3] < 8 && rfidp[4] > 2 && rfidp[4] < 11)//tag found
+        {
+          int uidlen = rfidp[4];
+          byte realuid[uidlen];
+          char hexrealuid[uidlen+4];
+          
+          unsigned char key[] PROGMEM = {0xe8, 0x0b, 0x6e, 0x3a, 0x12, 0x11, 0x40, 0x57,
+                                         0x7c, 0x7b, 0xea, 0x17, 0x64, 0x08, 0xe8, 0x6e};
+
+          sipHash.initFromPROGMEM(key);
+
+          // Read a UID!
+          for(int i=0;i<uidlen;i++)
+          {
+             realuid[i] = rfidp[12+i];
+             sipHash.updateHash((byte)realuid[i]);
+
+             if (lcd_rows == 4) {
+               if (i == 0) {
+                  sprintf(hexrealuid,"%02X",realuid[i]);
+               } else {
+                  sprintf(hex,"%02X",realuid[i]);
+                  strcat(hexrealuid,hex);
+               }
+            }
+          }
+		
+          sipHash.finish();
+
+          uid[0] = 0xE0;
+          uid[1] = 0x04;
+          sprintf(lcdline,"%s","E004");
+
+          for(int i = 2; i < 8; i++) {
+              uid[i] = (byte)sipHash.result[i];
+              sprintf(hex,"%02X",uid[i]);
+              strcat(lcdline,hex);
+          }
+
+          if (lcd_enabled) {
+            if (lcd_rows == 4) {
+              char line2[17];
+
+              lcd->setCursor(0,1);
+              sprintf(line2,"P%d ISO14443A ID:",readerNumber);
+              lcd->print(line2);
+  
+              lcd->setCursor(-4,2);
+              lcd->print("                ");
+              lcd->setCursor(-4,2);
+              strcat(hexrealuid," =");
+              lcd->print(hexrealuid);
+            }
+
+            if (LCD_STATUSLINE > 1) {
+              lcd->setCursor(-4,LCD_STATUSLINE);
+            } else {
+              lcd->setCursor(0,LCD_STATUSLINE);
+            }
+            lcd->print(lcdline);
+          }
+
+		
+          card = 1;
+          readcmd = false;
+          readstatus = 0;
+        }
+        else
+        {
           card = 0;
           readcmd = false;
           readstatus = 0;
         }
-            
+          
      }
      
      break;
      
      
-     }      
-     
-     
-     
+     }
    }
-      
-      
-
-	
-	
-
-		
 }
 
 byte RR10::isCardPresent()
@@ -244,6 +387,16 @@ boolean RR10::cmdUpdate()
     
 }
 
+void RR10::setReaderNumber(int reader)
+{
+    readerNumber = reader;
+}
 
-
+void RR10::setLcd(LiquidCrystal *passed_lcd, int passed_lcd_rows, int passed_lcd_statusline)
+{
+    lcd = passed_lcd;
+    lcd_rows = passed_lcd_rows;
+    lcd_statusline = passed_lcd_statusline;
+    lcd_enabled = true;
+}
 

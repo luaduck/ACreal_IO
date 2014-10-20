@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "RfidModule.h"
+#include <LiquidCrystal.h>
 
 class SL015M : public RfidModule
 {
@@ -13,6 +14,8 @@ public:
 	void update();	
     byte isCardPresent();
     void getUID(byte* uid);	
+    void setReaderNumber(int reader);
+    void setLcd(LiquidCrystal *passed_lcd, int lcd_rows, int lcd_statusline);
 
 private:
     byte card;               // card presence
@@ -26,6 +29,12 @@ private:
     
     boolean pinset;
     boolean readcmd; // read request from host flag
+
+    int readerNumber;           // P1 or P2?
+    LiquidCrystal *lcd;
+    int lcd_rows;
+    int lcd_statusline;
+    boolean lcd_enabled;
 
 };
 
