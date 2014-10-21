@@ -33,17 +33,20 @@ void RR10::update()
   // 16 chars + null
   char lcdline[17];
   char hex[2];
-      
+
+
+  while (cmdUpdate()) {
+   delay(50);
+  }     
+
+  // Reset important bits of state
+  card = 0;
       
    switch(readstatus)
    {
      case 0:
      {
      //let's read ISO15693 first
-     while (cmdUpdate()) {
-       delay(50);
-     }
-     
      byte cmd[7] = {0x07,0x06,0x00,0x00,0x00}; //command 0x06 : ISO15693 Tag Inventory (params : normal mode, no AFI)
      sendCmd(cmd);
      
@@ -111,10 +114,6 @@ void RR10::update()
      case 1:
      {
      //no ISO15696 found, let's try to find some FeliCa instead
-     while (cmdUpdate()) {
-       delay(50);
-     }
-
      byte cmd[4] = {0x04,0x0E,0x00,0x0A}; //command 0x0E : FeliCa Tag Inventory
      sendCmd(cmd);
      
@@ -179,10 +178,6 @@ void RR10::update()
      {
      // Give ISO14443-A a go, e.g. mifare classic.
      // Hashes the ID it gets back
-
-     while (cmdUpdate()) {
-       delay(50);
-     }
 
      byte cmd[5] = {0x05,0x09,0x00,0x00,0x00}; //command 0x09 : ISO14443 Tag Inventory 
      sendCmd(cmd);
